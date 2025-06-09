@@ -1,0 +1,105 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int           @id @default(autoincrement())
+  username     String        @unique @db.VarChar(100)
+  password     String        @db.VarChar(255)
+  role         Role          @default(kasir)
+  transactions Transaction[]
+
+  @@map("users")
+}
+
+model Product {
+  id             Int                @id @default(autoincrement())
+  name           String             @db.VarChar(255)
+  category       Category           @relation(fields: [category_id], references: [id])
+  category_id    Int
+  price          Decimal            @db.Decimal(10, 2) @default(0)
+  photo_url      String?            @db.VarChar(255)
+  stock_quantity Int                @default(0)
+  inventory      Inventory[]
+  details        TransactionDetail[]
+
+  @@map("products")
+}
+
+model Category {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique @db.VarChar(100)
+  products Product[]
+
+  @@map("categories")
+}
+
+model Transaction {
+  id               Int                @id @default(autoincrement())
+  user             User               @relation(fields: [user_id], references: [id])
+  user_id          Int
+  total_price      Decimal            @db.Decimal(10, 2)
+  payment_method   PaymentMethod
+  transaction_date DateTime           @default(now())
+  details          TransactionDetail[]
+  inventory        Inventory[]
+  receipt          Receipt?
+
+  @@map("transactions")
+}
+
+model TransactionDetail {
+  id             Int         @id @default(autoincrement())
+  transaction    Transaction @relation(fields: [transaction_id], references: [id])
+  transaction_id Int
+  product        Product     @relation(fields: [product_id], references: [id])
+  product_id     Int
+  quantity       Int
+  subtotal       Decimal     @db.Decimal(10, 2)
+
+  @@map("transaction_details")
+}
+
+model Inventory {
+  id             Int          @id @default(autoincrement())
+  product        Product      @relation(fields: [product_id], references: [id])
+  product_id     Int
+  quantity_changed Int
+  reason         InventoryReason
+  transaction    Transaction? @relation(fields: [transaction_id], references: [id])
+  transaction_id Int?
+  created_at     DateTime     @default(now())
+
+  @@map("inventory")
+}
+
+model Receipt {
+  id             Int         @id @default(autoincrement())
+  transaction    Transaction @relation(fields: [transaction_id], references: [id])
+  transaction_id Int         @unique
+  receipt_number String      @db.VarChar(100)
+  printed_at     DateTime    @default(now())
+
+  @@map("receipts")
+}
+
+enum Role {
+  admin
+  kasir
+}
+
+enum PaymentMethod {
+  tunai
+  kartu
+  e_wallet
+}
+
+enum InventoryReason {
+  sale
+  restock
+}
