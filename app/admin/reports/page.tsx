@@ -12,10 +12,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { format } from "date-fns";
 import { toast } from "sonner";
-import { Download } from "lucide-react";
-import { formatCurrency } from "@/lib/utils";
+import {
+  FileSpreadsheet,
+  TrendingUp,
+  Receipt,
+  CreditCard,
+  Calendar,
+} from "lucide-react";
 
 type SalesReport = {
   totalSales: number;
@@ -31,7 +35,21 @@ type SalesReport = {
     count: number;
     total: number;
   }[];
+  dailySales: {
+    date: string;
+    transactions: number;
+    revenue: number;
+  }[];
 };
+
+function formatCurrency(amount: number): string {
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount);
+}
 
 export default function ReportsPage() {
   const [startDate, setStartDate] = useState("");
@@ -43,7 +61,7 @@ export default function ReportsPage() {
   const generateReport = async () => {
     // Validate dates
     if (!startDate || !endDate) {
-      toast.error("Please select both start and end dates");
+      toast.error("Silakan pilih tanggal mulai dan tanggal akhir");
       return;
     }
 
@@ -51,7 +69,7 @@ export default function ReportsPage() {
     const end = new Date(endDate);
 
     if (start > end) {
-      toast.error("Start date must be before or equal to end date");
+      toast.error("Tanggal mulai harus sebelum atau sama dengan tanggal akhir");
       return;
     }
 
@@ -65,15 +83,15 @@ export default function ReportsPage() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to generate report");
+        throw new Error(errorData.error || "Gagal membuat laporan");
       }
 
       const data = await response.json();
       setReport(data);
-      toast.success("Report generated successfully");
+      toast.success("Laporan berhasil dibuat");
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to generate report"
+        error instanceof Error ? error.message : "Gagal membuat laporan"
       );
     } finally {
       setIsGenerating(false);
@@ -82,7 +100,7 @@ export default function ReportsPage() {
 
   const downloadReport = async () => {
     if (!startDate || !endDate) {
-      toast.error("Please generate a report first");
+      toast.error("Silakan buat laporan terlebih dahulu");
       return;
     }
 
@@ -95,23 +113,23 @@ export default function ReportsPage() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to download report");
+        throw new Error(errorData.error || "Gagal mengunduh laporan");
       }
 
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `sales-report-${startDate}-${endDate}.csv`;
+      a.download = `laporan-penjualan-${startDate}-${endDate}.xlsx`;
       document.body.appendChild(a);
       a.click();
       a.remove();
       window.URL.revokeObjectURL(url);
 
-      toast.success("Report downloaded successfully");
+      toast.success("Laporan berhasil diunduh");
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to download report"
+        error instanceof Error ? error.message : "Gagal mengunduh laporan"
       );
     } finally {
       setIsDownloading(false);
@@ -119,133 +137,227 @@ export default function ReportsPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Sales Reports</h1>
+    <div className="space-y-6 p-4 md:p-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-2xl md:text-3xl font-bold">Laporan Penjualan</h1>
+          <p className="text-muted-foreground">
+            Generate dan unduh laporan penjualan dalam format Excel
+          </p>
+        </div>
         {report && (
-          <Button onClick={downloadReport} disabled={isDownloading}>
-            <Download className="h-4 w-4 mr-2" />
-            {isDownloading ? "Downloading..." : "Download Report"}
+          <Button
+            onClick={downloadReport}
+            disabled={isDownloading}
+            className="w-full sm:w-auto"
+          >
+            <FileSpreadsheet className="h-4 w-4 mr-2" />
+            {isDownloading ? "Mengunduh..." : "Unduh Excel"}
           </Button>
         )}
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Generate Report</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <Calendar className="h-5 w-5" />
+            Generate Laporan
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex items-end gap-4">
-            <div className="flex-1">
-              <label className="text-sm font-medium">Start Date</label>
+          <div className="flex flex-col sm:flex-row items-end gap-4">
+            <div className="flex-1 w-full">
+              <label className="text-sm font-medium block mb-2">
+                Tanggal Mulai
+              </label>
               <Input
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
               />
             </div>
-            <div className="flex-1">
-              <label className="text-sm font-medium">End Date</label>
+            <div className="flex-1 w-full">
+              <label className="text-sm font-medium block mb-2">
+                Tanggal Akhir
+              </label>
               <Input
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
               />
             </div>
-            <Button onClick={generateReport} disabled={isGenerating}>
-              {isGenerating ? "Generating..." : "Generate"}
+            <Button
+              onClick={generateReport}
+              disabled={isGenerating}
+              className="w-full sm:w-auto"
+            >
+              {isGenerating ? "Membuat..." : "Generate"}
             </Button>
           </div>
         </CardContent>
       </Card>
 
       {report && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Total Sales</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold">
-                {formatCurrency(report.totalSales)}
-              </p>
-            </CardContent>
-          </Card>
+        <>
+          {/* Summary Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Total Penjualan
+                </CardTitle>
+                <TrendingUp className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-xl md:text-2xl font-bold">
+                  {formatCurrency(report.totalSales)}
+                </div>
+              </CardContent>
+            </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Total Transactions</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold">{report.totalTransactions}</p>
-            </CardContent>
-          </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Total Transaksi
+                </CardTitle>
+                <Receipt className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-xl md:text-2xl font-bold">
+                  {report.totalTransactions}
+                </div>
+              </CardContent>
+            </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Average Transaction</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold">
-                {formatCurrency(report.averageTransactionValue)}
-              </p>
-            </CardContent>
-          </Card>
+            <Card className="sm:col-span-2 lg:col-span-1">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Rata-rata Transaksi
+                </CardTitle>
+                <CreditCard className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-xl md:text-2xl font-bold">
+                  {formatCurrency(report.averageTransactionValue)}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
 
-          <Card className="md:col-span-2">
-            <CardHeader>
-              <CardTitle>Top Products</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Product</TableHead>
-                    <TableHead>Quantity Sold</TableHead>
-                    <TableHead>Revenue</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {report.topProducts.map((product, index) => (
-                    <TableRow key={index}>
-                      <TableCell>{product.name}</TableCell>
-                      <TableCell>{product.quantity}</TableCell>
-                      <TableCell>{formatCurrency(product.revenue)}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+          {/* Charts and Tables */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+            {/* Top Products */}
+            <Card className="lg:col-span-2">
+              <CardHeader>
+                <CardTitle>Produk Terlaris</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[50px]">Rank</TableHead>
+                        <TableHead>Produk</TableHead>
+                        <TableHead className="text-right">
+                          Qty Terjual
+                        </TableHead>
+                        <TableHead className="text-right">Pendapatan</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {report.topProducts.map((product, index) => (
+                        <TableRow key={index}>
+                          <TableCell className="font-medium">
+                            #{index + 1}
+                          </TableCell>
+                          <TableCell className="font-medium">
+                            {product.name}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            {product.quantity}
+                          </TableCell>
+                          <TableCell className="text-right font-medium">
+                            {formatCurrency(product.revenue)}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Sales by Payment Method</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Method</TableHead>
-                    <TableHead>Count</TableHead>
-                    <TableHead>Total</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {report.salesByPaymentMethod.map((method, index) => (
-                    <TableRow key={index}>
-                      <TableCell className="capitalize">
-                        {method.method}
-                      </TableCell>
-                      <TableCell>{method.count}</TableCell>
-                      <TableCell>{formatCurrency(method.total)}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </div>
+            {/* Payment Methods */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Metode Pembayaran</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Metode</TableHead>
+                        <TableHead className="text-right">Jumlah</TableHead>
+                        <TableHead className="text-right">Total</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {report.salesByPaymentMethod.map((method, index) => (
+                        <TableRow key={index}>
+                          <TableCell className="font-medium capitalize">
+                            {method.method}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            {method.count}
+                          </TableCell>
+                          <TableCell className="text-right font-medium">
+                            {formatCurrency(method.total)}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Daily Sales */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Penjualan Harian</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto max-h-[400px] overflow-y-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Tanggal</TableHead>
+                        <TableHead className="text-right">Transaksi</TableHead>
+                        <TableHead className="text-right">Pendapatan</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {report.dailySales.map((day, index) => (
+                        <TableRow key={index}>
+                          <TableCell className="font-medium">
+                            {new Date(day.date).toLocaleDateString("id-ID")}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            {day.transactions}
+                          </TableCell>
+                          <TableCell className="text-right font-medium">
+                            {formatCurrency(day.revenue)}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </>
       )}
     </div>
   );

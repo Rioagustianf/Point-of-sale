@@ -1,5 +1,7 @@
 "use client";
 
+import type React from "react";
+
 import { useState, useEffect } from "react";
 import {
   Table,
@@ -25,8 +27,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Pencil, Trash2, Plus } from "lucide-react";
+import { Pencil, Trash2, Plus, Users, Shield, UserIcon } from "lucide-react";
 
 type User = {
   id: number;
@@ -43,6 +47,7 @@ export default function UsersPage() {
     password: "",
     role: "",
   });
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetchUsers = async () => {
     try {
@@ -51,7 +56,9 @@ export default function UsersPage() {
       const data = await response.json();
       setUsers(data);
     } catch (error) {
-      toast.error("Failed to fetch users");
+      toast.error("Gagal memuat pengguna");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -73,7 +80,9 @@ export default function UsersPage() {
 
       if (!response.ok) throw new Error("Failed to save user");
 
-      toast.success(`User ${editingUser ? "updated" : "created"} successfully`);
+      toast.success(
+        `Pengguna berhasil ${editingUser ? "diperbarui" : "ditambahkan"}`
+      );
       setIsOpen(false);
       setFormData({
         username: "",
@@ -83,7 +92,7 @@ export default function UsersPage() {
       setEditingUser(null);
       fetchUsers();
     } catch (error) {
-      toast.error("Failed to save user");
+      toast.error("Gagal menyimpan pengguna");
     }
   };
 
@@ -98,7 +107,7 @@ export default function UsersPage() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm("Are you sure you want to delete this user?")) return;
+    if (!confirm("Apakah Anda yakin ingin menghapus pengguna ini?")) return;
 
     try {
       const response = await fetch(`/api/users/${id}`, {
@@ -107,17 +116,37 @@ export default function UsersPage() {
 
       if (!response.ok) throw new Error("Failed to delete user");
 
-      toast.success("User deleted successfully");
+      toast.success("Pengguna berhasil dihapus");
       fetchUsers();
     } catch (error) {
-      toast.error("Failed to delete user");
+      toast.error("Gagal menghapus pengguna");
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-600"></div>
+      </div>
+    );
+  }
+
+  const adminCount = users.filter((user) => user.role === "admin").length;
+  const kasirCount = users.filter((user) => user.role === "kasir").length;
+
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Users</h1>
+    <div className="space-y-6 p-4 md:p-6 bg-gradient-to-br from-slate-50 to-indigo-50 min-h-screen">
+      {/* Header Section */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="space-y-1">
+          <h1 className="text-2xl md:text-3xl font-bold text-slate-800 flex items-center gap-2">
+            <Users className="h-6 w-6 md:h-8 md:w-8 text-indigo-600" />
+            Manajemen Pengguna
+          </h1>
+          <p className="text-slate-600">
+            Kelola akses pengguna dan peran dalam sistem POS
+          </p>
+        </div>
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
             <Button
@@ -129,20 +158,24 @@ export default function UsersPage() {
                   role: "",
                 });
               }}
+              className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg"
             >
               <Plus className="h-4 w-4 mr-2" />
-              Add User
+              Tambah Pengguna
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle>
-                {editingUser ? "Edit User" : "Add User"}
+              <DialogTitle className="text-slate-800">
+                {editingUser ? "Edit Pengguna" : "Tambah Pengguna"}
               </DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <label htmlFor="username" className="text-sm font-medium">
+                <label
+                  htmlFor="username"
+                  className="text-sm font-medium text-slate-700"
+                >
                   Username
                 </label>
                 <Input
@@ -151,12 +184,18 @@ export default function UsersPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, username: e.target.value })
                   }
+                  placeholder="Masukkan username"
+                  className="border-slate-300 focus:border-indigo-500 focus:ring-indigo-500"
                   required
                 />
               </div>
               <div className="space-y-2">
-                <label htmlFor="password" className="text-sm font-medium">
-                  Password {editingUser && "(leave blank to keep current)"}
+                <label
+                  htmlFor="password"
+                  className="text-sm font-medium text-slate-700"
+                >
+                  Password{" "}
+                  {editingUser && "(kosongkan jika tidak ingin mengubah)"}
                 </label>
                 <Input
                   id="password"
@@ -165,12 +204,17 @@ export default function UsersPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, password: e.target.value })
                   }
+                  placeholder="Masukkan password"
+                  className="border-slate-300 focus:border-indigo-500 focus:ring-indigo-500"
                   required={!editingUser}
                 />
               </div>
               <div className="space-y-2">
-                <label htmlFor="role" className="text-sm font-medium">
-                  Role
+                <label
+                  htmlFor="role"
+                  className="text-sm font-medium text-slate-700"
+                >
+                  Peran
                 </label>
                 <Select
                   value={formData.role}
@@ -179,60 +223,148 @@ export default function UsersPage() {
                   }
                   required
                 >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select role" />
+                  <SelectTrigger className="border-slate-300 focus:border-indigo-500 focus:ring-indigo-500">
+                    <SelectValue placeholder="Pilih peran" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="admin">Admin</SelectItem>
-                    <SelectItem value="kasir">Cashier</SelectItem>
+                    <SelectItem value="admin">Administrator</SelectItem>
+                    <SelectItem value="kasir">Kasir</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-              <Button type="submit" className="w-full">
-                {editingUser ? "Update" : "Create"}
+              <Button
+                type="submit"
+                className="w-full bg-indigo-600 hover:bg-indigo-700"
+              >
+                {editingUser ? "Perbarui" : "Tambah"}
               </Button>
             </form>
           </DialogContent>
         </Dialog>
       </div>
 
-      <div className="bg-white rounded-lg shadow">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Username</TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead className="w-[100px]">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {users.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell>{user.username}</TableCell>
-                <TableCell className="capitalize">{user.role}</TableCell>
-                <TableCell>
-                  <div className="flex space-x-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleEdit(user)}
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleDelete(user.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <Card className="bg-white shadow-sm border-slate-200">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-slate-600">
+              Total Pengguna
+            </CardTitle>
+            <Users className="h-4 w-4 text-indigo-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-slate-800">
+              {users.length}
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="bg-white shadow-sm border-slate-200">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-slate-600">
+              Administrator
+            </CardTitle>
+            <Shield className="h-4 w-4 text-red-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-slate-800">
+              {adminCount}
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="bg-white shadow-sm border-slate-200">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-slate-600">
+              Kasir
+            </CardTitle>
+            <UserIcon className="h-4 w-4 text-blue-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-slate-800">
+              {kasirCount}
+            </div>
+          </CardContent>
+        </Card>
       </div>
+
+      {/* Users Table */}
+      <Card className="bg-white shadow-sm border-slate-200">
+        <CardHeader>
+          <CardTitle className="text-slate-800">Daftar Pengguna</CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-slate-50">
+                  <TableHead className="font-semibold text-slate-700">
+                    Username
+                  </TableHead>
+                  <TableHead className="font-semibold text-slate-700">
+                    Peran
+                  </TableHead>
+                  <TableHead className="font-semibold text-slate-700 w-[120px]">
+                    Aksi
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {users.length === 0 ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={3}
+                      className="text-center py-8 text-slate-500"
+                    >
+                      Belum ada pengguna. Tambahkan pengguna pertama Anda!
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  users.map((user) => (
+                    <TableRow key={user.id} className="hover:bg-slate-50">
+                      <TableCell className="font-medium text-slate-800">
+                        {user.username}
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant={
+                            user.role === "admin" ? "destructive" : "secondary"
+                          }
+                          className={
+                            user.role === "admin"
+                              ? "bg-red-100 text-red-800"
+                              : "bg-blue-100 text-blue-800"
+                          }
+                        >
+                          {user.role === "admin" ? "Administrator" : "Kasir"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex space-x-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleEdit(user)}
+                            className="h-8 w-8 text-slate-600 hover:text-blue-600 hover:bg-blue-50"
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDelete(user.id)}
+                            className="h-8 w-8 text-slate-600 hover:text-red-600 hover:bg-red-50"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

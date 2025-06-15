@@ -1,5 +1,7 @@
 "use client";
 
+import type React from "react";
+
 import { useState, useEffect } from "react";
 import {
   Table,
@@ -18,8 +20,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Pencil, Trash2, Plus } from "lucide-react";
+import { Pencil, Trash2, Plus, Tag, Package } from "lucide-react";
 
 type Category = {
   id: number;
@@ -34,6 +38,7 @@ export default function CategoriesPage() {
   const [isOpen, setIsOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [name, setName] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetchCategories = async () => {
     try {
@@ -42,7 +47,9 @@ export default function CategoriesPage() {
       const data = await response.json();
       setCategories(data);
     } catch (error) {
-      toast.error("Failed to fetch categories");
+      toast.error("Gagal memuat kategori");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -67,14 +74,14 @@ export default function CategoriesPage() {
       if (!response.ok) throw new Error("Failed to save category");
 
       toast.success(
-        `Category ${editingCategory ? "updated" : "created"} successfully`
+        `Kategori berhasil ${editingCategory ? "diperbarui" : "ditambahkan"}`
       );
       setIsOpen(false);
       setName("");
       setEditingCategory(null);
       fetchCategories();
     } catch (error) {
-      toast.error("Failed to save category");
+      toast.error("Gagal menyimpan kategori");
     }
   };
 
@@ -85,7 +92,7 @@ export default function CategoriesPage() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm("Are you sure you want to delete this category?")) return;
+    if (!confirm("Apakah Anda yakin ingin menghapus kategori ini?")) return;
 
     try {
       const response = await fetch(`/api/categories/${id}`, {
@@ -94,17 +101,34 @@ export default function CategoriesPage() {
 
       if (!response.ok) throw new Error("Failed to delete category");
 
-      toast.success("Category deleted successfully");
+      toast.success("Kategori berhasil dihapus");
       fetchCategories();
     } catch (error) {
-      toast.error("Failed to delete category");
+      toast.error("Gagal menghapus kategori");
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-600"></div>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Categories</h1>
+    <div className="space-y-6 p-4 md:p-6 bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
+      {/* Header Section */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="space-y-1">
+          <h1 className="text-2xl md:text-3xl font-bold text-slate-800 flex items-center gap-2">
+            <Tag className="h-6 w-6 md:h-8 md:w-8 text-blue-600" />
+            Manajemen Kategori
+          </h1>
+          <p className="text-slate-600">
+            Kelola kategori produk untuk sistem POS Anda
+          </p>
+        </div>
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
             <Button
@@ -112,74 +136,149 @@ export default function CategoriesPage() {
                 setEditingCategory(null);
                 setName("");
               }}
+              className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white shadow-lg"
             >
               <Plus className="h-4 w-4 mr-2" />
-              Add Category
+              Tambah Kategori
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle>
-                {editingCategory ? "Edit Category" : "Add Category"}
+              <DialogTitle className="text-slate-800">
+                {editingCategory ? "Edit Kategori" : "Tambah Kategori"}
               </DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <label htmlFor="name" className="text-sm font-medium">
-                  Name
+                <label
+                  htmlFor="name"
+                  className="text-sm font-medium text-slate-700"
+                >
+                  Nama Kategori
                 </label>
                 <Input
                   id="name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
+                  placeholder="Masukkan nama kategori"
+                  className="border-slate-300 focus:border-blue-500 focus:ring-blue-500"
                   required
                 />
               </div>
-              <Button type="submit" className="w-full">
-                {editingCategory ? "Update" : "Create"}
+              <Button
+                type="submit"
+                className="w-full bg-blue-600 hover:bg-blue-700"
+              >
+                {editingCategory ? "Perbarui" : "Tambah"}
               </Button>
             </form>
           </DialogContent>
         </Dialog>
       </div>
 
-      <div className="bg-white rounded-lg shadow">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Products Count</TableHead>
-              <TableHead className="w-[100px]">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {categories.map((category) => (
-              <TableRow key={category.id}>
-                <TableCell>{category.name}</TableCell>
-                <TableCell>{category._count.products}</TableCell>
-                <TableCell>
-                  <div className="flex space-x-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleEdit(category)}
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleDelete(category.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <Card className="bg-white shadow-sm border-slate-200">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-slate-600">
+              Total Kategori
+            </CardTitle>
+            <Tag className="h-4 w-4 text-blue-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-slate-800">
+              {categories.length}
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="bg-white shadow-sm border-slate-200">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-slate-600">
+              Total Produk
+            </CardTitle>
+            <Package className="h-4 w-4 text-green-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-slate-800">
+              {categories.reduce((sum, cat) => sum + cat._count.products, 0)}
+            </div>
+          </CardContent>
+        </Card>
       </div>
+
+      {/* Categories Table */}
+      <Card className="bg-white shadow-sm border-slate-200">
+        <CardHeader>
+          <CardTitle className="text-slate-800">Daftar Kategori</CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-slate-50">
+                  <TableHead className="font-semibold text-slate-700">
+                    Nama Kategori
+                  </TableHead>
+                  <TableHead className="font-semibold text-slate-700">
+                    Jumlah Produk
+                  </TableHead>
+                  <TableHead className="font-semibold text-slate-700 w-[120px]">
+                    Aksi
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {categories.length === 0 ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={3}
+                      className="text-center py-8 text-slate-500"
+                    >
+                      Belum ada kategori. Tambahkan kategori pertama Anda!
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  categories.map((category) => (
+                    <TableRow key={category.id} className="hover:bg-slate-50">
+                      <TableCell className="font-medium text-slate-800">
+                        {category.name}
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant="secondary"
+                          className="bg-blue-100 text-blue-800"
+                        >
+                          {category._count.products} produk
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex space-x-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleEdit(category)}
+                            className="h-8 w-8 text-slate-600 hover:text-blue-600 hover:bg-blue-50"
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDelete(category.id)}
+                            className="h-8 w-8 text-slate-600 hover:text-red-600 hover:bg-red-50"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
