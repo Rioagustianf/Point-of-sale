@@ -39,6 +39,7 @@ import {
   Archive,
 } from "lucide-react";
 import Image from "next/image";
+import { cn } from "@/lib/utils";
 
 type Product = {
   id: number;
@@ -197,7 +198,7 @@ export default function ProductsPage() {
   ).length;
 
   return (
-    <div className="space-y-6 p-4 md:p-6 bg-gradient-to-br from-slate-50 to-green-50 min-h-screen">
+    <div className="space-y-6 p-4 md:p-6 bg-gradient-to-br from-green-50 via-blue-50 to-white min-h-screen">
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div className="space-y-1">
@@ -354,41 +355,41 @@ export default function ProductsPage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="bg-white shadow-sm border-slate-200">
+        <Card className="bg-gradient-to-br from-green-400 to-green-600 text-white shadow-lg border-0">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-slate-600">
+            <CardTitle className="text-sm font-medium text-green-100">
               Total Produk
             </CardTitle>
-            <Package className="h-4 w-4 text-green-600" />
+            <Package className="h-4 w-4 text-green-200" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-800">
+            <div className="text-2xl font-bold text-white">
               {products.length}
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-white shadow-sm border-slate-200">
+        <Card className="bg-gradient-to-br from-blue-400 to-blue-600 text-white shadow-lg border-0">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-slate-600">
+            <CardTitle className="text-sm font-medium text-blue-100">
               Nilai Inventori
             </CardTitle>
-            <DollarSign className="h-4 w-4 text-blue-600" />
+            <DollarSign className="h-4 w-4 text-blue-200" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-800">
+            <div className="text-2xl font-bold text-white">
               {formatCurrency(totalValue)}
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-white shadow-sm border-slate-200">
+        <Card className="bg-gradient-to-br from-orange-400 to-orange-600 text-white shadow-lg border-0">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-slate-600">
+            <CardTitle className="text-sm font-medium text-orange-100">
               Stok Menipis
             </CardTitle>
-            <Archive className="h-4 w-4 text-orange-600" />
+            <Archive className="h-4 w-4 text-orange-200" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-800">
+            <div className="text-2xl font-bold text-white">
               {lowStockProducts}
             </div>
           </CardContent>
@@ -396,7 +397,7 @@ export default function ProductsPage() {
       </div>
 
       {/* Products Table */}
-      <Card className="bg-white shadow-sm border-slate-200">
+      <Card className="bg-white shadow-lg border-0 mt-6">
         <CardHeader>
           <CardTitle className="text-slate-800">Daftar Produk</CardTitle>
         </CardHeader>
@@ -404,23 +405,23 @@ export default function ProductsPage() {
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow className="bg-slate-50">
-                  <TableHead className="font-semibold text-slate-700">
+                <TableRow className="bg-blue-600 hover:bg-blue-700">
+                  <TableHead className="font-semibold text-white border-b border-blue-200">
                     Produk
                   </TableHead>
-                  <TableHead className="font-semibold text-slate-700">
+                  <TableHead className="font-semibold text-white border-b border-blue-200">
                     Kategori
                   </TableHead>
-                  <TableHead className="font-semibold text-slate-700">
+                  <TableHead className="font-semibold text-white border-b border-blue-200">
                     Harga
                   </TableHead>
-                  <TableHead className="font-semibold text-slate-700">
+                  <TableHead className="font-semibold text-white border-b border-blue-200">
                     Stok
                   </TableHead>
-                  <TableHead className="font-semibold text-slate-700">
+                  <TableHead className="font-semibold text-white border-b border-blue-200">
                     Foto
                   </TableHead>
-                  <TableHead className="font-semibold text-slate-700 w-[120px]">
+                  <TableHead className="font-semibold text-white border-b border-blue-200 w-[120px]">
                     Aksi
                   </TableHead>
                 </TableRow>
@@ -436,15 +437,22 @@ export default function ProductsPage() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  products.map((product) => (
-                    <TableRow key={product.id} className="hover:bg-slate-50">
+                  products.map((product, idx) => (
+                    <TableRow
+                      key={product.id}
+                      className={cn(
+                        "transition-colors border-b border-blue-100",
+                        idx % 2 === 0 ? "bg-blue-50" : "bg-white",
+                        "hover:bg-blue-100/80"
+                      )}
+                    >
                       <TableCell className="font-medium text-slate-800">
                         {product.name}
                       </TableCell>
                       <TableCell>
                         <Badge
                           variant="outline"
-                          className="border-blue-200 text-blue-700"
+                          className="border-blue-600 text-blue-700 bg-blue-100 font-semibold shadow-sm"
                         >
                           {product.category.name}
                         </Badge>
@@ -489,7 +497,7 @@ export default function ProductsPage() {
                             variant="ghost"
                             size="icon"
                             onClick={() => handleEdit(product)}
-                            className="h-8 w-8 text-slate-600 hover:text-blue-600 hover:bg-blue-50"
+                            className="h-8 w-8 text-slate-600 hover:text-blue-600 hover:bg-blue-100"
                           >
                             <Pencil className="h-4 w-4" />
                           </Button>
@@ -497,7 +505,7 @@ export default function ProductsPage() {
                             variant="ghost"
                             size="icon"
                             onClick={() => handleDelete(product.id)}
-                            className="h-8 w-8 text-slate-600 hover:text-red-600 hover:bg-red-50"
+                            className="h-8 w-8 text-slate-600 hover:text-red-600 hover:bg-red-100"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>

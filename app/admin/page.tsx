@@ -180,7 +180,7 @@ export default async function AdminDashboard() {
         <div className="space-y-2">
           <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-slate-800 flex items-center gap-3">
             <BarChart3 className="h-8 w-8 md:h-10 md:w-10 text-blue-600" />
-            Dashboard Analytics
+            Dashboard Analitik
           </h1>
           <p className="text-slate-600 text-sm md:text-base">
             Pantau performa bisnis dan analisis penjualan secara real-time
@@ -207,7 +207,7 @@ export default async function AdminDashboard() {
           <Card className="bg-gradient-to-br from-emerald-500 to-emerald-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 border-0">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-emerald-100">
-                Total Users
+                Total Pengguna
               </CardTitle>
               <Users className="h-5 w-5 text-emerald-200" />
             </CardHeader>
@@ -292,7 +292,9 @@ export default async function AdminDashboard() {
                   <Users className="h-5 w-5 text-white" />
                 </div>
                 <div>
-                  <p className="font-semibold text-slate-800">Kelola Users</p>
+                  <p className="font-semibold text-slate-800">
+                    Kelola Pengguna
+                  </p>
                   <p className="text-xs text-slate-600">Manajemen pengguna</p>
                 </div>
               </div>
@@ -322,11 +324,9 @@ export default async function AdminDashboard() {
                   <Activity className="h-5 w-5 text-white" />
                 </div>
                 <div>
-                  <p className="font-semibold text-slate-800">
-                    Generate Laporan
-                  </p>
+                  <p className="font-semibold text-slate-800">Buat Laporan</p>
                   <p className="text-xs text-slate-600">
-                    Export data penjualan
+                    Ekspor data penjualan
                   </p>
                 </div>
               </div>

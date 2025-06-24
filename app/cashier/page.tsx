@@ -157,19 +157,19 @@ export default function CashierPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">New Transaction</h1>
+      <h1 className="text-3xl font-bold text-blue-700">Transaksi Baru</h1>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <Card>
             <CardHeader>
-              <CardTitle>Products</CardTitle>
+              <CardTitle>Produk</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="mb-4">
                 <Input
                   type="text"
-                  placeholder="Search products..."
+                  placeholder="Cari produk..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full"
@@ -191,8 +191,8 @@ export default function CashierPage() {
                           className="object-cover rounded-t-lg"
                         />
                       ) : (
-                        <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                          No Image
+                        <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-500">
+                          Tidak Ada Gambar
                         </div>
                       )}
                     </div>
@@ -220,13 +220,13 @@ export default function CashierPage() {
         <div>
           <Card>
             <CardHeader>
-              <CardTitle>Cart</CardTitle>
+              <CardTitle>Keranjang</CardTitle>
             </CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Product</TableHead>
+                    <TableHead>Produk</TableHead>
                     <TableHead className="text-right">Total</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -252,17 +252,19 @@ export default function CashierPage() {
 
               <div className="mt-4 space-y-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Payment Method</label>
+                  <label className="text-sm font-medium">
+                    Metode Pembayaran
+                  </label>
                   <Select
                     value={paymentMethod}
                     onValueChange={setPaymentMethod}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select payment method" />
+                      <SelectValue placeholder="Pilih metode pembayaran" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="tunai">Cash</SelectItem>
-                      <SelectItem value="kartu">Card</SelectItem>
+                      <SelectItem value="tunai">Tunai</SelectItem>
+                      <SelectItem value="kartu">Kartu</SelectItem>
                       <SelectItem value="e_wallet">E-Wallet</SelectItem>
                     </SelectContent>
                   </Select>
@@ -281,7 +283,7 @@ export default function CashierPage() {
                   onClick={() => setCart([])}
                   disabled={cart.length === 0}
                 >
-                  Clear Cart
+                  Bersihkan Keranjang
                 </Button>
               </div>
             </CardContent>
@@ -295,21 +297,21 @@ export default function CashierPage() {
           {receiptData && (
             <>
               <h2 className="text-center font-bold text-xl mb-4">
-                Sales Receipt
+                Struk Penjualan
               </h2>
               <div className="mb-4">
-                <p>Date: {new Date().toLocaleString()}</p>
+                <p>Tanggal: {new Date().toLocaleString()}</p>
                 <p>
-                  Receipt Number: {receiptData.receipt?.receipt_number || "N/A"}
+                  Nomor Struk: {receiptData.receipt?.receipt_number || "N/A"}
                 </p>
-                <p>Payment Method: {receiptData.paymentMethod}</p>
+                <p>Metode Pembayaran: {receiptData.paymentMethod}</p>
               </div>
               <table className="w-full mb-4">
                 <thead>
                   <tr>
                     <th className="text-left">Item</th>
                     <th className="text-right">Qty</th>
-                    <th className="text-right">Price</th>
+                    <th className="text-right">Harga</th>
                     <th className="text-right">Total</th>
                   </tr>
                 </thead>
@@ -339,7 +341,7 @@ export default function CashierPage() {
                 </tfoot>
               </table>
               <p className="text-center text-sm">
-                Thank you for your purchase!
+                Terima kasih atas pembelian Anda!
               </p>
             </>
           )}

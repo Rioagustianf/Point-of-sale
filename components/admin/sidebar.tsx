@@ -63,12 +63,12 @@ export function AdminSidebar() {
   }, []);
 
   return (
-    <Sidebar>
-      <SidebarContent>
+    <Sidebar className="bg-blue-800 text-white min-h-screen">
+      <SidebarContent className="bg-blue-800 to-blue-300">
         <SidebarHeader>
           <div className="flex flex-row items-center gap-2">
             <Image src={logo} width={50} height={50} alt="logo" />
-            <p className="text-xl font-semibold">DENALI STORE</p>
+            <p className="text-xl font-semibold text-white">DENALI STORE</p>
           </div>
         </SidebarHeader>
         <SidebarGroup>
@@ -76,7 +76,15 @@ export function AdminSidebar() {
             <SidebarMenu>
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.label}>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton
+                    asChild
+                    className={cn(
+                      "hover:bg-blue-700 hover:text-white transition-all",
+                      pathname === item.url
+                        ? "bg-blue-700 text-white font-bold shadow-lg"
+                        : ""
+                    )}
+                  >
                     <a href={item.url}>
                       <item.icon />
                       <span>{item.label}</span>
@@ -88,7 +96,7 @@ export function AdminSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter>
+      <SidebarFooter className="bg-blue-800 to-blue-300">
         <NavUser></NavUser>
       </SidebarFooter>
     </Sidebar>

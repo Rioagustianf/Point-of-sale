@@ -122,10 +122,10 @@ export default function AdminTransactionsPage() {
     );
   }
 
-  const totalRevenue = transactions.reduce(
-    (sum, transaction) => sum + transaction.total_price,
-    0
-  );
+  const totalRevenue = transactions.reduce((sum, transaction) => {
+    const price = Number(transaction.total_price);
+    return isFinite(price) && !isNaN(price) ? sum + price : sum;
+  }, 0);
   const todayTransactions = transactions.filter(
     (transaction) =>
       new Date(transaction.transaction_date).toDateString() ===
@@ -232,20 +232,20 @@ export default function AdminTransactionsPage() {
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-slate-50">
-                    <TableHead className="font-semibold text-slate-700">
+                  <TableRow className="bg-blue-600 hover:bg-blue-700">
+                    <TableHead className="font-semibold text-white border-b border-blue-200">
                       Tanggal
                     </TableHead>
-                    <TableHead className="font-semibold text-slate-700">
+                    <TableHead className="font-semibold text-white border-b border-blue-200">
                       Kasir
                     </TableHead>
-                    <TableHead className="font-semibold text-slate-700">
+                    <TableHead className="font-semibold text-white border-b border-blue-200">
                       Metode Bayar
                     </TableHead>
-                    <TableHead className="font-semibold text-slate-700">
+                    <TableHead className="font-semibold text-white border-b border-blue-200">
                       Total
                     </TableHead>
-                    <TableHead className="font-semibold text-slate-700 w-[100px]">
+                    <TableHead className="font-semibold text-white border-b border-blue-200 w-[100px]">
                       Aksi
                     </TableHead>
                   </TableRow>

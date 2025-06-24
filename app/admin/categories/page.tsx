@@ -24,6 +24,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Pencil, Trash2, Plus, Tag, Package } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 type Category = {
   id: number;
@@ -117,7 +118,7 @@ export default function CategoriesPage() {
   }
 
   return (
-    <div className="space-y-6 p-4 md:p-6 bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
+    <div className="space-y-6 p-4 md:p-6 bg-blue-50 min-h-screen">
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div className="space-y-1">
@@ -178,7 +179,7 @@ export default function CategoriesPage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <Card className="bg-white shadow-sm border-slate-200">
+        <Card className="bg-white shadow-md border-0">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-slate-600">
               Total Kategori
@@ -191,7 +192,7 @@ export default function CategoriesPage() {
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-white shadow-sm border-slate-200">
+        <Card className="bg-white shadow-md border-0">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-slate-600">
               Total Produk
@@ -207,7 +208,7 @@ export default function CategoriesPage() {
       </div>
 
       {/* Categories Table */}
-      <Card className="bg-white shadow-sm border-slate-200">
+      <Card className="bg-white shadow-md border-0 mt-6">
         <CardHeader>
           <CardTitle className="text-slate-800">Daftar Kategori</CardTitle>
         </CardHeader>
@@ -215,14 +216,14 @@ export default function CategoriesPage() {
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow className="bg-slate-50">
-                  <TableHead className="font-semibold text-slate-700">
-                    Nama Kategori
+                <TableRow className="bg-blue-600 hover:bg-blue-700">
+                  <TableHead className="font-semibold text-white border-b border-blue-200">
+                    Kategori
                   </TableHead>
-                  <TableHead className="font-semibold text-slate-700">
+                  <TableHead className="font-semibold text-white border-b border-blue-200">
                     Jumlah Produk
                   </TableHead>
-                  <TableHead className="font-semibold text-slate-700 w-[120px]">
+                  <TableHead className="font-semibold text-white border-b border-blue-200 w-[120px]">
                     Aksi
                   </TableHead>
                 </TableRow>
@@ -238,17 +239,21 @@ export default function CategoriesPage() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  categories.map((category) => (
-                    <TableRow key={category.id} className="hover:bg-slate-50">
+                  categories.map((category, idx) => (
+                    <TableRow
+                      key={category.id}
+                      className={cn(
+                        "transition-colors border-b border-blue-100",
+                        idx % 2 === 0 ? "bg-blue-50" : "bg-white",
+                        "hover:bg-blue-100/80"
+                      )}
+                    >
                       <TableCell className="font-medium text-slate-800">
                         {category.name}
                       </TableCell>
                       <TableCell>
-                        <Badge
-                          variant="secondary"
-                          className="bg-blue-100 text-blue-800"
-                        >
-                          {category._count.products} produk
+                        <Badge className="border-blue-600 text-blue-700 bg-blue-100 font-semibold shadow-sm">
+                          {category._count.products}
                         </Badge>
                       </TableCell>
                       <TableCell>
@@ -257,7 +262,7 @@ export default function CategoriesPage() {
                             variant="ghost"
                             size="icon"
                             onClick={() => handleEdit(category)}
-                            className="h-8 w-8 text-slate-600 hover:text-blue-600 hover:bg-blue-50"
+                            className="h-8 w-8 text-slate-600 hover:text-blue-600 hover:bg-blue-100"
                           >
                             <Pencil className="h-4 w-4" />
                           </Button>
@@ -265,7 +270,7 @@ export default function CategoriesPage() {
                             variant="ghost"
                             size="icon"
                             onClick={() => handleDelete(category.id)}
-                            className="h-8 w-8 text-slate-600 hover:text-red-600 hover:bg-red-50"
+                            className="h-8 w-8 text-slate-600 hover:text-red-600 hover:bg-red-100"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>

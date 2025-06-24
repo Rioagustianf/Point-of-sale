@@ -295,14 +295,14 @@ export default function UsersPage() {
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow className="bg-slate-50">
-                  <TableHead className="font-semibold text-slate-700">
+                <TableRow className="bg-blue-600 hover:bg-blue-700">
+                  <TableHead className="font-semibold text-white border-b border-blue-200">
                     Username
                   </TableHead>
-                  <TableHead className="font-semibold text-slate-700">
+                  <TableHead className="font-semibold text-white border-b border-blue-200">
                     Peran
                   </TableHead>
-                  <TableHead className="font-semibold text-slate-700 w-[120px]">
+                  <TableHead className="font-semibold text-white border-b border-blue-200 w-[120px]">
                     Aksi
                   </TableHead>
                 </TableRow>

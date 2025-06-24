@@ -20,6 +20,7 @@ import {
   CreditCard,
   Calendar,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 type SalesReport = {
   totalSales: number;
@@ -137,7 +138,7 @@ export default function ReportsPage() {
   };
 
   return (
-    <div className="space-y-6 p-4 md:p-6">
+    <div className="space-y-6 p-4 md:p-6 bg-blue-50 min-h-screen">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold">Laporan Penjualan</h1>
@@ -149,7 +150,7 @@ export default function ReportsPage() {
           <Button
             onClick={downloadReport}
             disabled={isDownloading}
-            className="w-full sm:w-auto"
+            className="w-full sm:w-auto bg-blue-700 hover:bg-blue-800 text-white"
           >
             <FileSpreadsheet className="h-4 w-4 mr-2" />
             {isDownloading ? "Mengunduh..." : "Unduh Excel"}
@@ -189,7 +190,7 @@ export default function ReportsPage() {
             <Button
               onClick={generateReport}
               disabled={isGenerating}
-              className="w-full sm:w-auto"
+              className="w-full sm:w-auto bg-blue-700 hover:bg-blue-800 text-white"
             >
               {isGenerating ? "Membuat..." : "Generate"}
             </Button>
@@ -266,7 +267,14 @@ export default function ReportsPage() {
                     </TableHeader>
                     <TableBody>
                       {report.topProducts.map((product, index) => (
-                        <TableRow key={index}>
+                        <TableRow
+                          key={index}
+                          className={cn(
+                            "transition-colors border-b border-blue-100",
+                            index % 2 === 0 ? "bg-blue-50" : "bg-white",
+                            "hover:bg-blue-700 hover:text-white"
+                          )}
+                        >
                           <TableCell className="font-medium">
                             #{index + 1}
                           </TableCell>
@@ -304,7 +312,14 @@ export default function ReportsPage() {
                     </TableHeader>
                     <TableBody>
                       {report.salesByPaymentMethod.map((method, index) => (
-                        <TableRow key={index}>
+                        <TableRow
+                          key={index}
+                          className={cn(
+                            "transition-colors border-b border-blue-100",
+                            index % 2 === 0 ? "bg-blue-50" : "bg-white",
+                            "hover:bg-blue-700 hover:text-white"
+                          )}
+                        >
                           <TableCell className="font-medium capitalize">
                             {method.method}
                           </TableCell>
@@ -339,7 +354,14 @@ export default function ReportsPage() {
                     </TableHeader>
                     <TableBody>
                       {report.dailySales.map((day, index) => (
-                        <TableRow key={index}>
+                        <TableRow
+                          key={index}
+                          className={cn(
+                            "transition-colors border-b border-blue-100",
+                            index % 2 === 0 ? "bg-blue-50" : "bg-white",
+                            "hover:bg-blue-700 hover:text-white"
+                          )}
+                        >
                           <TableCell className="font-medium">
                             {new Date(day.date).toLocaleDateString("id-ID")}
                           </TableCell>
@@ -359,6 +381,40 @@ export default function ReportsPage() {
           </div>
         </>
       )}
+
+      <Card className="bg-white shadow-md border-0 mt-6">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-blue-100">
+          <CardTitle className="text-sm font-medium text-blue-700">
+            Daftar Laporan
+          </CardTitle>
+          <FileSpreadsheet className="h-4 w-4 text-blue-700" />
+        </CardHeader>
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-blue-600 hover:bg-blue-700">
+                  <TableHead className="font-semibold text-white border-b border-blue-200">
+                    Tanggal
+                  </TableHead>
+                  <TableHead className="font-semibold text-white border-b border-blue-200">
+                    Transaksi
+                  </TableHead>
+                  <TableHead className="font-semibold text-white border-b border-blue-200">
+                    Pendapatan
+                  </TableHead>
+                  <TableHead className="font-semibold text-white border-b border-blue-200 w-[120px]">
+                    Aksi
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {/* Render laporan di sini, striped dan hover sama seperti tabel lain */}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

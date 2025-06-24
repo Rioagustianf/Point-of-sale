@@ -55,14 +55,14 @@ export default function LoginPage() {
         <CardHeader>
           <CardTitle className="text-2xl flex flex-col justify-center items-center">
             <Image src={logo} alt="Logo" width={70} height={70} />
-            <p>Login to your account</p>
+            <p>Masuk ke akun Anda</p>
           </CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <label htmlFor="username" className="text-sm font-medium">
-                Username
+                Nama Pengguna
               </label>
               <Input
                 id="username"
@@ -74,7 +74,7 @@ export default function LoginPage() {
             </div>
             <div className="space-y-2">
               <label htmlFor="password" className="text-sm font-medium">
-                Password
+                Kata Sandi
               </label>
               <Input
                 id="password"
@@ -85,7 +85,7 @@ export default function LoginPage() {
               />
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Logging in..." : "Login"}
+              {loading ? "Sedang masuk..." : "Masuk"}
             </Button>
           </form>
         </CardContent>

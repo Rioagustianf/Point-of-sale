@@ -7,7 +7,7 @@ export default function CashierLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen bg-gradient-to-br from-gray-100 to-blue-50">
       <SidebarProvider>
         <SidebarTrigger />
         <CashierSidebar />

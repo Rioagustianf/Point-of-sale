@@ -22,12 +22,12 @@ export function DatePicker() {
         <Button
           variant={"outline"}
           className={cn(
-            "w-[240px] justify-start text-left font-normal",
-            !date && "text-muted-foreground"
+            "w-[240px] justify-start text-left font-normal bg-blue-50 hover:bg-blue-100 border-blue-300 text-blue-700",
+            !date && "text-blue-400"
           )}
         >
           <CalendarIcon />
-          {date ? format(date, "PPP") : <span>Pick a date</span>}
+          {date ? format(date, "PPP") : <span>Pilih tanggal</span>}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">
