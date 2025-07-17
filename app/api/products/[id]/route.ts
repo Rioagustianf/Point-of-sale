@@ -113,8 +113,9 @@ export async function DELETE(
   }
 
   try {
-    await prisma.product.delete({
+    await prisma.product.update({
       where: { id: Number.parseInt(params.id) },
+      data: { deletedAt: new Date() },
     });
     return NextResponse.json({ success: true });
   } catch (error) {

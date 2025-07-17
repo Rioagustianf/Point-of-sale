@@ -8,11 +8,11 @@ export default async function Home() {
     redirect("/login");
   }
 
-  if (session.user.role === "admin") {
+  if (session.user?.role === "admin") {
     redirect("/admin");
   }
 
-  if (session.user.role === "kasir") {
+  if (session.user?.role === "kasir") {
     redirect("/cashier");
   }
 }
